@@ -1,7 +1,8 @@
 import 'package:bigworks_project/icons/icon.dart';
 import 'package:bigworks_project/services/weather_services.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
+import 'dart:async'; 
 import 'package:lottie/lottie.dart';
   String city = 'Los Angeles';
 class Header extends StatefulWidget {
@@ -31,6 +32,26 @@ class _HeaderState extends State<Header> {
   var _textfieldController = TextEditingController();
   bool _isLoadinf = false;
   bool notFound = false;
+
+  String _formattedTime = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentTime(); // Call this to fetch the current time when the widget initializes
+
+    // Optionally update the time every minute (you can customize this interval)
+    Timer.periodic(Duration(minutes: 1), (timer) {
+      _getCurrentTime();  // Update time periodically if needed
+    });
+  }
+
+  // Function to get the current time
+  void _getCurrentTime() {
+    DateTime now = DateTime.now(); // Get the current date and time
+     _formattedTime = DateFormat('hh:mm a').format(now); // Format it as HH:mm
+    setState(() {});  // Update the state to refresh the UI
+  }
 
   loadingFunc() async {
     await weatherService.getWeatherData(city);
@@ -98,14 +119,14 @@ class _HeaderState extends State<Header> {
                 ? Text('not found')
                 : Row(
                     children: [
-                      Column(
-                        children: [
+                      Column(crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [  
                           SizedBox(
                             width: 200,
                             child: Text(
-                              widget.temp.toString() + '°',
+                              widget.temp.toString() + '°C',
                               style: const TextStyle(
-                                  fontSize: 60, fontWeight: FontWeight.w200),
+                                  fontSize: 55, fontWeight: FontWeight.w200),
                             ),
                           ),
                           SizedBox(
@@ -122,6 +143,15 @@ class _HeaderState extends State<Header> {
                               widget.state_name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ),SizedBox(
+                            width: 100,
+                            child: Text(
+                              _formattedTime,  
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w100,
                               ),
                             ),
                           ),
